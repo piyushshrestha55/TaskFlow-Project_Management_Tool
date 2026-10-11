@@ -13,6 +13,7 @@ import SideBarLayout from "./components/SideBarLayout";
 import Task from "./pages/Task";
 import Projects from "./pages/Projects";
 import Team from "./pages/Team";
+import { createAuthLoader } from "./loaders/authLoader";
 
 const routes = [
   {
@@ -51,6 +52,7 @@ const routes = [
       },
       {
         path: "team",
+        loader: createAuthLoader("/team/"),
         Component: Team
       }
     ]

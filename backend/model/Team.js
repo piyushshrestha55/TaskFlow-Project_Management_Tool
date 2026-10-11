@@ -13,7 +13,11 @@ const teamSchema = new mongoose.Schema(
       trim: true,
       default: ""
     },
-
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true
+    },
     members: [
       {
         type: mongoose.Schema.Types.ObjectId,

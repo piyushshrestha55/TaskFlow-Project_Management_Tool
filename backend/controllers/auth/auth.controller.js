@@ -70,7 +70,7 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
     const payload = {
-      userid: user._id.toString(),
+      id: user._id.toString(),
       name: user.name,
       username: user.username,
       email: user.email
