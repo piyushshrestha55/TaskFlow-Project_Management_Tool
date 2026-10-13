@@ -41,7 +41,10 @@ const LogIn = () => {
       form.reset();
       navigate("/dashboard");
     } catch (error) {
-      console.log(error.response?.data || error.message);
+      form.setError("password", {
+        type: "server",
+        message: "Invalid email or password"
+      });
     }
   };
   return (

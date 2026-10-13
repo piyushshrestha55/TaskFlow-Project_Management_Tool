@@ -40,14 +40,17 @@ const routes = [
     children: [
       {
         path: "dashboard",
+        loader: createAuthLoader("/dashboard/"),
         Component: Dashboard
       },
       {
         path: "tasks",
+        loader: createAuthLoader("/tasks/"),
         Component: Task
       },
       {
         path: "projects",
+        loader: createAuthLoader("/project/"),
         Component: Projects
       },
       {

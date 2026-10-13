@@ -1,4 +1,22 @@
 import Project from "../../model/Project.js";
+import { getUserProjects } from "../../service/project.service.js";
+const loadProject = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const projects = await getUserProjects(userId);
+
+    return res.status(200).json({
+      success: true,
+      projects
+    });
+  } catch (error) {
+    console.log("Failed to load projects.", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch teams"
+    });
+  }
+};
 const createProject = async (req, res) => {
   try {
     const { name, description, teamId, members, status } = req.body;
@@ -24,4 +42,4 @@ const createProject = async (req, res) => {
   }
 };
 
-export { createProject };
+export { createProject, loadProject };

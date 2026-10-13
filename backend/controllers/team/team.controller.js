@@ -1,8 +1,9 @@
 import Team from "../../model/Team.js";
+import { getUserTeams } from "../../service/team.service.js";
 const createTeam = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { name, description } = req.body.name;
+    const { name, description } = req.body;
     if (!name || !description) {
       return res.status(400).json({
         success: false,
@@ -27,14 +28,7 @@ const createTeam = async (req, res) => {
 const loadMyTeam = async (req, res) => {
   try {
     const userId = req.user.id;
-    if (!userId) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Id is required" });
-    }
-    const teams = await Team.find({
-      $or: [{ createdBy: userId }, { members: userId }]
-    });
+    const teams = await getUserTeams();
     return res.status(200).json({
       success: true,
       teams

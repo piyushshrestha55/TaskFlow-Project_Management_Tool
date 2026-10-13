@@ -5,6 +5,9 @@ import { connectDB } from "./config/connectDB.js";
 import userRouter from "./routes/auth.routes.js";
 import projectRouter from "./routes/project.routes.js";
 import teamRouter from "./routes/team.routes.js";
+import dashboardRouter from "./routes/dashboard.routes.js";
+import tasksRouter from "./routes/task.routes.js";
+
 dotenv.config();
 
 const port = process.env.PORT || 5000;
@@ -15,6 +18,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/auth", userRouter);
 app.use("/team", teamRouter);
 app.use("/project", projectRouter);
+app.use("/tasks", tasksRouter);
+app.use("/dashboard", dashboardRouter);
 app.get("/", (req, res) => {
   res.status(200).json({ message: "Hello world" });
 });
