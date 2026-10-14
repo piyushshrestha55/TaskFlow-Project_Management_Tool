@@ -41,9 +41,13 @@ const LogIn = () => {
       form.reset();
       navigate("/dashboard");
     } catch (error) {
-      form.setError("password", {
+      const message =
+        error.response?.data?.message ||
+        "Unable to connect to the server. Please try again.";
+
+      form.setError("root.serverError", {
         type: "server",
-        message: "Invalid email or password"
+        message
       });
     }
   };
@@ -57,6 +61,14 @@ const LogIn = () => {
         </div>
         <div>
           <form onSubmit={form.handleSubmit(onSubmit)} className=" space-y-5">
+            {form.formState.errors.root?.serverError && (
+              <div
+                role="alert"
+                className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600"
+              >
+                {form.formState.errors.root.serverError.message}
+              </div>
+            )}
             <Controller
               name="email"
               control={form.control}

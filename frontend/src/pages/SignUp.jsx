@@ -65,7 +65,15 @@ const SignUp = () => {
       form.reset();
       navigate("/login");
     } catch (error) {
-      console.error(error.response?.data || error.message);
+      const message =
+        error.response?.data?.message ||
+        error.message ||
+        "Something went wrong";
+
+      form.setError("root.serverError", {
+        type: "server",
+        message
+      });
     }
   };
   return (
@@ -78,6 +86,14 @@ const SignUp = () => {
         </div>
         <div>
           <form onSubmit={form.handleSubmit(onSubmit)} className=" space-y-3">
+            {form.formState.errors.root?.serverError && (
+              <div
+                role="alert"
+                className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600"
+              >
+                {form.formState.errors.root.serverError.message}
+              </div>
+            )}
             <Controller
               name="name"
               control={form.control}
