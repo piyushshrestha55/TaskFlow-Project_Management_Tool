@@ -30,7 +30,7 @@ const SideBar = () => {
         hidden sm:flex sm:flex-col
       "
     >
-      <div className="w-full text-lg font-semibold sm:text-xl flex justify-center items-center sm:py-3 cursor-pointer py-1">
+      <div className="w-full text-lg font-semibold sm:text-xl flex justify-center items-center sm:py-5  cursor-pointer py-1">
         Task<span className="font-bold text-orange-500">Flow</span>
       </div>
 

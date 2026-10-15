@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useLoaderData } from "react-router";
+import UserTemplate from "@/components/UserTemplate";
 const Dashboard = () => {
   const data = useLoaderData();
   const [user, setUser] = useState(null);
@@ -20,10 +21,7 @@ const Dashboard = () => {
   console.log("Data:", data);
   return (
     <div className="min-h-screen">
-      <div className="h-[125vh]">Hello, {user?.name || "User"}</div>
-      {/* <h1>Hello, {user?.name || "User"}</h1>
-      <p>Username: {user?.username || "Not found"}</p>
-      <p>Email: {user?.email || "Not found"}</p> */}
+      <UserTemplate title={"Dashboard"} />
     </div>
   );
 };

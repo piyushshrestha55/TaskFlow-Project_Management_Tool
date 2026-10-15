@@ -3,7 +3,7 @@ import Project from "../model/Project.js";
 
 // Reusable filter for teams accessible to a user
 const getUserTeamFilter = (userId) => ({
-  $or: [{ createdBy: userId }, { members: userId }]
+  $or: [{ createdBy: userId }, { "members.user": userId }]
 });
 
 // gets all the teams that the user is involved in

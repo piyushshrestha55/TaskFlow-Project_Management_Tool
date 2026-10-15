@@ -28,7 +28,7 @@ const createTeam = async (req, res) => {
 const loadMyTeam = async (req, res) => {
   try {
     const userId = req.user.id;
-    const teams = await getUserTeams();
+    const teams = await getUserTeams(userId);
     return res.status(200).json({
       success: true,
       teams

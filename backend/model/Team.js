@@ -1,5 +1,18 @@
 import mongoose from "mongoose";
-
+const teamMemberSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true
+    },
+    role: {
+      type: String,
+      default: "Member"
+    }
+  },
+  { _id: false }
+);
 const teamSchema = new mongoose.Schema(
   {
     name: {
@@ -18,12 +31,7 @@ const teamSchema = new mongoose.Schema(
       ref: "User",
       required: true
     },
-    members: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
-      }
-    ]
+    members: [teamMemberSchema]
   },
   {
     timestamps: true
