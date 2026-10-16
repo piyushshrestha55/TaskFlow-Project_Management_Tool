@@ -43,3 +43,20 @@ export const getUserTeamProjectCount = async (userId) => {
     teamId: { $in: teamIds }
   });
 };
+
+//creating a team
+export const createMyTeam = async (userId, name, description) => {
+  const member = {
+    userId,
+    role: "admin"
+  };
+
+  const team = await Team.create({
+    name,
+    description,
+    createdBy: userId,
+    members: [member]
+  });
+
+  return team;
+};

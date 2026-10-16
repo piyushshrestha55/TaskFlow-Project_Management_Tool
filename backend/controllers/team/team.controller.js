@@ -1,21 +1,16 @@
 import Team from "../../model/Team.js";
-import { getUserTeams } from "../../service/team.service.js";
+import { createMyTeam, getUserTeams } from "../../service/team.service.js";
 const createTeam = async (req, res) => {
   try {
     const userId = req.user.id;
     const { name, description } = req.body;
-    if (!name || !description) {
+    if (!name?.trim()) {
       return res.status(400).json({
         success: false,
-        message: "Team Name and Description is required"
+        message: "Team Name is required"
       });
     }
-    const team = await Team.create({
-      name: name,
-      description: description,
-      createdBy: userId,
-      members: [userId]
-    });
+    const team = await createMyTeam(userId, name, description);
     return res.status(201).json({ success: true, team });
   } catch (error) {
     console.error(error);

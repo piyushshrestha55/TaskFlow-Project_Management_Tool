@@ -10,7 +10,7 @@ const projectMemberSchema = new mongoose.Schema(
 
     role: {
       type: String,
-      enum: ["member", "viewer"],
+      enum: ["manager", "member", "viewer"],
       default: "member"
     }
   },

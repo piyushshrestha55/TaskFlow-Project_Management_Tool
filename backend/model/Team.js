@@ -8,7 +8,8 @@ const teamMemberSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      default: "Member"
+      enum: ["admin", "member"],
+      default: "member"
     }
   },
   { _id: false }
