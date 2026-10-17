@@ -41,22 +41,26 @@ const routes = [
       {
         path: "dashboard",
         loader: createAuthLoader("/dashboard/"),
-        Component: Dashboard
+        Component: Dashboard,
+        HydrateFallback: LoadingFallback
       },
       {
         path: "tasks",
         loader: createAuthLoader("/tasks/"),
-        Component: Task
+        Component: Task,
+        HydrateFallback: LoadingFallback
       },
       {
         path: "projects",
         loader: createAuthLoader("/project/"),
-        Component: Projects
+        Component: Projects,
+        HydrateFallback: LoadingFallback
       },
       {
         path: "team",
         loader: createAuthLoader("/team/"),
-        Component: Team
+        Component: Team,
+        HydrateFallback: LoadingFallback
       }
     ]
   }
@@ -68,10 +72,15 @@ const router = createBrowserRouter(routes, {
   }
 });
 
-function App() {
+function LoadingFallback() {
   return (
-    <RouterProvider router={router} fallbackElement={<div>Loading...</div>} />
+    <div className="flex min-h-screen items-center justify-center">
+      <p className="text-gray-500">Loading...</p>
+    </div>
   );
+}
+function App() {
+  return <RouterProvider router={router} />;
 }
 
 export default App;

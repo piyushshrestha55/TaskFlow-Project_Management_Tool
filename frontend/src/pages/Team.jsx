@@ -4,12 +4,13 @@ import React, { useState } from "react";
 import CreateTeam from "@/components/Teams/createTeam";
 import { useLoaderData } from "react-router";
 import { AnimatePresence, motion } from "motion/react";
+import TeamCard from "@/components/Teams/teamCard";
 
 const Team = () => {
   const { teams: initialTeams } = useLoaderData();
   const [teams, setTeams] = useState(initialTeams ?? []);
   const [showForm, setShowForm] = useState(false);
-
+  console.log(teams);
   return (
     <div className="min-h-screen">
       <UserTemplate title="Team Management" />
@@ -57,6 +58,7 @@ const Team = () => {
         </AnimatePresence>
 
         {/* Render your teams list here using the teams state */}
+        <TeamCard teams={teams} setTeams={setTeams} />
       </div>
     </div>
   );
