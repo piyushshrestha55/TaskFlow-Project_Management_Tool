@@ -3,7 +3,7 @@ import Team from "../model/Team.js";
 
 const getUserProjectFilter = async (userId) => {
   const teams = await Team.find({
-    "members.user": userId
+    "members.userId": userId
   }).select("_id");
 
   const teamIds = teams.map((team) => team._id);
