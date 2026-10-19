@@ -62,3 +62,100 @@ export const createMyTeam = async (userId, name, description) => {
 
   return team;
 };
+
+//add Team members
+export const addMembersToTeam = async (teamId, memberId) => {
+  const team = await Team.findById(teamId);
+
+  if (!team) {
+    throw new Error("Team not found.");
+  }
+
+  // Checking if the user is already a member
+  const alreadyMember = team.members.some(
+    (member) => member.userId.toString() === memberId.toString()
+  );
+
+  if (alreadyMember) {
+    throw new Error("User is already a member of this team.");
+  }
+
+  // Add the new member
+  team.members.push({
+    userId: memberId,
+    role: "member"
+  });
+
+  // Save changes to MongoDB
+  await team.save();
+
+  return team;
+};
+
+// delete the team members
+export const removeMemberFromTeam = async (teamId, memberId) => {
+  const team = await Team.findById(teamId);
+
+  if (!team) {
+    throw new Error("Team not found.");
+  }
+
+  // Finds the member
+  const memberExists = team.members.some(
+    (member) => member.userId.toString() === memberId.toString()
+  );
+
+  if (!memberExists) {
+    throw new Error("Member not found in the team.");
+  }
+
+  // Prevent removing the team creator
+  if (team.createdBy.toString() === memberId.toString()) {
+    throw new Error("Cannot remove the team creator.");
+  }
+
+  // Remove the member
+  team.members = team.members.filter(
+    (member) => member.userId.toString() !== memberId.toString()
+  );
+
+  await team.save();
+
+  return team;
+};
+
+// updates the members role in the team
+export const updatingMemberRoleFromTeam = async (teamId, memberId, role) => {
+  const team = await Team.findById(teamId);
+  if (!team) {
+    throw new Error("Team not found.");
+  }
+  if (!role) {
+    throw new Error("Role is not assigned.");
+  }
+  // Validate allowed roles
+  const allowedRoles = ["admin", "member"];
+
+  if (!allowedRoles.includes(role)) {
+    throw new Error("Invalid role.");
+  }
+  //checking if the members exits or not
+  const member = team.members.find(
+    (member) => member.userId.toString() === memberId.toString()
+  );
+
+  if (!member) {
+    throw new Error("Member is not found in the team.");
+  }
+
+  // Prevent changing the creator's role
+  if (team.createdBy.toString() === memberId.toString()) {
+    throw new Error("Cannot change the team creator's role.");
+  }
+
+  // Update the member's role
+  member.role = role;
+
+  await team.save();
+  return team;
+};
