@@ -3,9 +3,11 @@ import { motion } from "motion/react";
 import { UserRound, ShieldCheck } from "lucide-react";
 import { Button } from "../ui/button";
 import { jwtDecode } from "jwt-decode";
+import ManageTeam from "./ManageTeam";
 
-const TeamDetails = ({ team, onClose }) => {
+const TeamDetails = ({ team, onClose, onTeamUpdated }) => {
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isManageOpen, setIsManageOpen] = useState(false);
   console.log(team);
   useEffect(() => {
     try {
@@ -118,12 +120,23 @@ const TeamDetails = ({ team, onClose }) => {
 
         {isAdmin && (
           <div className="flex justify-end px-8 py-2">
-            <Button className="bg-orange-400 hover:bg-orange-500 text-white hover:font-semibold hover:-translate-y-0.5">
+            <Button
+              onClick={() => setIsManageOpen(true)}
+              className="bg-orange-400 text-white hover:bg-orange-500
+        hover:font-semibold hover:-translate-y-0.5"
+            >
               Manage Team
             </Button>
           </div>
         )}
       </div>
+      {isAdmin && isManageOpen && (
+        <ManageTeam
+          team={team}
+          onClose={() => setIsManageOpen(false)}
+          onTeamUpdated={onTeamUpdated}
+        />
+      )}
     </motion.section>
   );
 };

@@ -57,7 +57,6 @@ const Team = () => {
           )}
         </AnimatePresence>
 
-        {/* Render your teams list here using the teams state */}
         <TeamCard teams={teams} setTeams={setTeams} />
       </div>
     </div>

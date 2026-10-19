@@ -4,8 +4,10 @@ import {
   addMembersToTeam,
   createMyTeam,
   getUserTeams,
-  removeMemberFromTeam
+  removeMemberFromTeam,
+  updatingMemberRoleFromTeam
 } from "../../service/team.service.js";
+import { handleTeamError } from "../../utils/teamError.js";
 const createTeam = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -45,6 +47,7 @@ const addMember = async (req, res) => {
   try {
     const { memberId } = req.body;
     const { teamId } = req.params;
+
     if (!memberId) {
       return res.status(400).json({
         success: false,
@@ -67,13 +70,14 @@ const addMember = async (req, res) => {
       message: "Member added successfully.",
       team
     });
-  } catch (error) {}
+  } catch (error) {
+    return handleTeamError(res, error, "Failed to add team member.");
+  }
 };
 
-export const removeMember = async (req, res) => {
+const removeMember = async (req, res) => {
   try {
-    const { teamId } = req.params;
-    const { memberId } = req.body;
+    const { teamId, memberId } = req.params;
 
     if (!memberId) {
       return res.status(400).json({
@@ -100,34 +104,45 @@ export const removeMember = async (req, res) => {
       team
     });
   } catch (error) {
-    if (error.message === "Team not found.") {
-      return res.status(404).json({
+    return handleTeamError(res, error, "Failed to remove team member.");
+  }
+};
+// update the role of members in team
+const updateMemberRole = async (req, res) => {
+  try {
+    const { teamId, memberId } = req.params;
+    const { role } = req.body;
+
+    // Validate role
+    if (!role) {
+      return res.status(400).json({
         success: false,
-        message: error.message
+        message: "Role is required."
       });
     }
 
-    if (error.message === "Member not found in this team.") {
-      return res.status(404).json({
+    // Validating the MongoDB IDs
+    if (
+      !mongoose.isValidObjectId(teamId) ||
+      !mongoose.isValidObjectId(memberId)
+    ) {
+      return res.status(400).json({
         success: false,
-        message: error.message
+        message: "Invalid team ID or member ID."
       });
     }
 
-    if (error.message === "Cannot remove the team creator.") {
-      return res.status(403).json({
-        success: false,
-        message: error.message
-      });
-    }
+    // Calling the service
+    const team = await updatingMemberRoleFromTeam(teamId, memberId, role);
 
-    console.error("Error removing team member:", error);
-
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error."
+    return res.status(200).json({
+      success: true,
+      message: "Member role updated successfully.",
+      team
     });
+  } catch (error) {
+    return handleTeamError(res, error, "Failed to update member role.");
   }
 };
 
-export { createTeam, loadMyTeam, addMember, removeMember };
+export { createTeam, loadMyTeam, addMember, removeMember, updateMemberRole };

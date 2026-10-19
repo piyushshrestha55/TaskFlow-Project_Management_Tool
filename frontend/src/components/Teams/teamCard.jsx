@@ -4,7 +4,15 @@ import { ChevronRight, ShieldCheck, UserRound, Users } from "lucide-react";
 import TeamDetails from "./TeamDetails";
 const TeamCard = ({ teams, setTeams }) => {
   const [team, setTeam] = useState(null);
+  const handleTeamUpdated = (updatedTeam) => {
+    setTeams((prevTeams) =>
+      prevTeams.map((t) =>
+        String(t._id) === String(updatedTeam._id) ? updatedTeam : t
+      )
+    );
 
+    setTeam(updatedTeam);
+  };
   if (!teams?.length) {
     return (
       <div
@@ -162,7 +170,11 @@ const TeamCard = ({ teams, setTeams }) => {
           </motion.div>
         ))}
       </div>
-      <TeamDetails team={team} onClose={() => setTeam(null)} />
+      <TeamDetails
+        team={team}
+        onClose={() => setTeam(null)}
+        onTeamUpdated={handleTeamUpdated}
+      />
     </div>
   );
 };
