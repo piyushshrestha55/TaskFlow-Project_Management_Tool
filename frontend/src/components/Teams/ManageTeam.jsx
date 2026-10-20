@@ -46,6 +46,7 @@ const ManageTeam = ({ team, onClose, onTeamUpdated }) => {
   // Search registered users by email.
   const handleSearch = async (event) => {
     event.preventDefault();
+
     setError("");
     setSuccess("");
     setFoundUser(null);
@@ -56,26 +57,45 @@ const ManageTeam = ({ team, onClose, onTeamUpdated }) => {
       setError("Please enter an email address.");
       return;
     }
-    console.log("Searching");
+
     setSearching(true);
 
     try {
-      const response = await api.get(
-        `/users/search?email=${encodeURIComponent(normalizedEmail)}`
-      );
-      console.log(response.data);
-      if (!response.data.user) {
-        throw new Error("No registered user found.");
+      const response = await api.get("/users/search", {
+        params: { email: normalizedEmail }
+      });
+
+      const user = response.data?.user;
+
+      if (
+        !response.data?.success ||
+        !user ||
+        typeof user !== "object" ||
+        !user._id
+      ) {
+        setError("No registered user found with that email.");
+        return;
       }
 
-      if (isAlreadyMember(response.data.user._id)) {
+      if (user.email?.trim().toLowerCase() !== normalizedEmail) {
+        setError("No registered user found with that email.");
+        return;
+      }
+
+      if (isAlreadyMember(user._id)) {
         setError("This user is already a member of the team.");
         return;
       }
-      const user = response.data.user;
-      setFoundUser(Array.isArray(user) ? user[0] : user);
+
+      setFoundUser(user);
     } catch (err) {
-      setError(err.message || "Unable to search for this user.");
+      if (err.response?.status === 404) {
+        setError("No registered user found with that email.");
+      } else {
+        setError(
+          err.response?.data?.message || "Unable to search for this user."
+        );
+      }
     } finally {
       setSearching(false);
     }
