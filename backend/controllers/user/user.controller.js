@@ -10,7 +10,7 @@ export const searchUserByEmail = async (req, res) => {
       });
     }
     const normalizedEmail = email.trim().toLowerCase();
-    const user = await User.find({
+    const user = await User.findOne({
       email: normalizedEmail
     }).select("name username email avatar");
 

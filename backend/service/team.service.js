@@ -1,11 +1,16 @@
 import Team from "../model/Team.js";
 import Project from "../model/Project.js";
-
+import { User } from "../model/User.js";
 // Reusable filter for teams accessible to a user
 const getUserTeamFilter = (userId) => ({
   $or: [{ createdBy: userId }, { "members.userId": userId }]
 });
 
+const getPopulatedTeam = async (teamId) => {
+  return Team.findById(teamId)
+    .populate("members.userId", "name email username avatar")
+    .populate("createdBy", "name email");
+};
 // gets all the teams that the user is involved in
 export const getUserTeams = async (userId) => {
   return await Team.find(getUserTeamFilter(userId))
@@ -71,25 +76,31 @@ export const addMembersToTeam = async (teamId, memberId) => {
     throw new Error("Team not found.");
   }
 
-  // Checking if the user is already a member
+  // Verify that the registered user exists.
+  const userExists = await User.exists({ _id: memberId });
+
+  if (!userExists) {
+    throw new Error("Registered user not found.");
+  }
+
+  // Prevent duplicate memberships.
   const alreadyMember = team.members.some(
-    (member) => member.userId.toString() === memberId.toString()
+    (member) => String(member.userId) === String(memberId)
   );
 
   if (alreadyMember) {
     throw new Error("User is already a member of this team.");
   }
 
-  // Add the new member
   team.members.push({
     userId: memberId,
     role: "member"
   });
 
-  // Save changes to MongoDB
   await team.save();
 
-  return team;
+  // Return populated member details.
+  return await getPopulatedTeam(team._id);
 };
 
 // delete the team members
@@ -100,62 +111,67 @@ export const removeMemberFromTeam = async (teamId, memberId) => {
     throw new Error("Team not found.");
   }
 
-  // Finds the member
+  if (String(team.createdBy) === String(memberId)) {
+    throw new Error("Cannot remove the team creator.");
+  }
+
   const memberExists = team.members.some(
-    (member) => member.userId.toString() === memberId.toString()
+    (member) => String(member.userId) === String(memberId)
   );
 
   if (!memberExists) {
     throw new Error("Member not found in the team.");
   }
 
-  // Prevent removing the team creator
-  if (team.createdBy.toString() === memberId.toString()) {
-    throw new Error("Cannot remove the team creator.");
-  }
-
-  // Remove the member
   team.members = team.members.filter(
-    (member) => member.userId.toString() !== memberId.toString()
+    (member) => String(member.userId) !== String(memberId)
   );
 
   await team.save();
 
-  return team;
+  return await getPopulatedTeam(team._id);
 };
 
 // updates the members role in the team
 export const updatingMemberRoleFromTeam = async (teamId, memberId, role) => {
-  const team = await Team.findById(teamId);
-  if (!team) {
-    throw new Error("Team not found.");
-  }
-  if (!role) {
-    throw new Error("Role is not assigned.");
-  }
-  // Validate allowed roles
   const allowedRoles = ["admin", "member"];
 
   if (!allowedRoles.includes(role)) {
     throw new Error("Invalid role.");
   }
-  //checking if the members exits or not
-  const member = team.members.find(
-    (member) => member.userId.toString() === memberId.toString()
-  );
 
-  if (!member) {
-    throw new Error("Member is not found in the team.");
+  const team = await Team.findById(teamId);
+
+  if (!team) {
+    throw new Error("Team not found.");
   }
 
-  // Prevent changing the creator's role
-  if (team.createdBy.toString() === memberId.toString()) {
+  // Prevent changing the creators role.
+  if (String(team.createdBy) === String(memberId)) {
     throw new Error("Cannot change the team creator's role.");
   }
 
-  // Update the member's role
-  member.role = role;
+  // Find the existing membership.
+  const memberExists = team.members.some(
+    (member) => String(member.userId) === String(memberId)
+  );
 
-  await team.save();
-  return team;
+  if (!memberExists) {
+    throw new Error("Member is not found in the team.");
+  }
+
+  // Update the existing member, never push a new one.
+  await Team.updateOne(
+    {
+      _id: teamId,
+      "members.userId": memberId
+    },
+    {
+      $set: {
+        "members.$.role": role
+      }
+    }
+  );
+
+  return await getPopulatedTeam(teamId);
 };
