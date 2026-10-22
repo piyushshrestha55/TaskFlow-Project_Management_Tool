@@ -8,7 +8,6 @@ import ManageTeam from "./ManageTeam";
 const TeamDetails = ({ team, onClose, onTeamUpdated }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isManageOpen, setIsManageOpen] = useState(false);
-  console.log(team);
   useEffect(() => {
     try {
       const token = localStorage.getItem("token");

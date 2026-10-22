@@ -3,6 +3,7 @@ import { authenticate } from "../middleware/auth.middleware.js";
 import {
   addMember,
   createTeam,
+  deleteTeamController,
   loadMyTeam,
   removeMember,
   updateMemberRole
@@ -25,4 +26,5 @@ router.patch(
   isAdmin,
   updateMemberRole
 );
+router.delete("/delete/:teamId", authenticate, isAdmin, deleteTeamController);
 export default router;

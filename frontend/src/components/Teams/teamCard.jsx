@@ -5,6 +5,15 @@ import TeamDetails from "./TeamDetails";
 const TeamCard = ({ teams, setTeams }) => {
   const [team, setTeam] = useState(null);
   const handleTeamUpdated = (updatedTeam) => {
+    if (updatedTeam?._deleted) {
+      setTeams((prevTeams) =>
+        prevTeams.filter((t) => String(t._id) !== String(updatedTeam._id))
+      );
+
+      setTeam(null);
+      return;
+    }
+
     setTeams((prevTeams) =>
       prevTeams.map((t) =>
         String(t._id) === String(updatedTeam._id) ? updatedTeam : t
@@ -101,11 +110,12 @@ const TeamCard = ({ teams, setTeams }) => {
                   const role = member.role ?? "member";
                   const isAdmin =
                     typeof role === "string" && role.toLowerCase() === "admin";
-                  const userId = member?.userId;
+                  const user = member?.userId;
+                  const userId = user?._id ?? user;
 
                   return (
                     <div
-                      key={userId ?? memberIndex}
+                      key={String(userId ?? memberIndex)}
                       className="flex items-center gap-3"
                     >
                       <div
@@ -121,9 +131,11 @@ const TeamCard = ({ teams, setTeams }) => {
                           className="truncate text-sm
                           font-medium text-gray-700"
                         >
-                          {userId ? String(userId.name) : "Unknown user"}
+                          {user ? String(user.name) : "Unknown user"}
                         </p>
-                        <p className="text-xs text-gray-400">User ID</p>
+                        <p className="text-xs text-gray-400">
+                          {user ? user.email : "Email"}
+                        </p>
                       </div>
 
                       <span

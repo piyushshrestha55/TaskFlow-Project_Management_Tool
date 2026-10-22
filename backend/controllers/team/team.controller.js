@@ -1,8 +1,8 @@
-import Team from "../../model/Team.js";
 import mongoose from "mongoose";
 import {
   addMembersToTeam,
   createMyTeam,
+  deleteTeamService,
   getUserTeams,
   removeMemberFromTeam,
   updatingMemberRoleFromTeam
@@ -144,5 +144,37 @@ const updateMemberRole = async (req, res) => {
     return handleTeamError(res, error, "Failed to update member role.");
   }
 };
+const deleteTeamController = async (req, res) => {
+  try {
+    const { teamId } = req.params;
+    const userId = req.user?.id;
+    console.log("I am running");
 
-export { createTeam, loadMyTeam, addMember, removeMember, updateMemberRole };
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required."
+      });
+    }
+
+    const result = await deleteTeamService(teamId, userId);
+
+    return res.status(200).json({
+      success: true,
+      ...result
+    });
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message || "Unable to delete team."
+    });
+  }
+};
+export {
+  createTeam,
+  loadMyTeam,
+  addMember,
+  removeMember,
+  updateMemberRole,
+  deleteTeamController
+};
