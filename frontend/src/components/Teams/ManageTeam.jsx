@@ -24,6 +24,7 @@ const ManageTeam = ({ team, onClose, onTeamUpdated }) => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const [deletingTeam, setDeletingTeam] = useState(false);
   useEffect(() => {
     setMembers(team?.members ?? []);
   }, [team]);
@@ -205,6 +206,35 @@ const ManageTeam = ({ team, onClose, onTeamUpdated }) => {
     }
   };
 
+  const handleRemoveTeam = async () => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${team.name}"? This action cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    setDeletingTeam(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      await api.delete(`/team/delete/${team._id}`);
+
+      // Tell the parent that this team was deleted.
+      onTeamUpdated?.({
+        ...team,
+        _deleted: true
+      });
+
+      onClose?.();
+    } catch (err) {
+      console.error("Delete team failed:", err.response?.data || err);
+
+      setError(err.response?.data?.message || "Unable to delete this team.");
+    } finally {
+      setDeletingTeam(false);
+    }
+  };
   if (!team) return null;
 
   return (
@@ -486,7 +516,30 @@ const ManageTeam = ({ team, onClose, onTeamUpdated }) => {
             )}
           </div>
         </div>
+        {/* Deleting section */}
+        <div className="border-t border-red-100 pt-5">
+          <div className="rounded-xl border border-red-200 bg-red-50/50 p-4">
+            <h3 className="font-semibold text-red-700">Danger zone</h3>
 
+            <p className="mt-1 text-sm text-gray-600">
+              Permanently delete this team. This action cannot be undone.
+            </p>
+
+            <Button
+              type="button"
+              onClick={handleRemoveTeam}
+              disabled={deletingTeam}
+              className="mt-4 bg-red-600 text-white hover:bg-red-700"
+            >
+              {deletingTeam ? (
+                <LoaderCircle className="mr-2 animate-spin" size={17} />
+              ) : (
+                <Trash2 className="mr-2" size={17} />
+              )}
+              Delete Team
+            </Button>
+          </div>
+        </div>
         <div className="flex justify-end border-t border-gray-100 pt-4">
           <Button type="button" variant="outline" onClick={onClose}>
             Done

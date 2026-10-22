@@ -16,13 +16,21 @@ export const teamErrorStatus = {
   // 409 - Conflict
   "User is already a member of this team.": 409
 };
-export const handleTeamError = (res, error, fallbackMessage) => {
-  const status = teamErrorStatus[error.message];
+
+export const handleTeamError = (
+  res,
+  error,
+  fallbackMessage = "Internal server error."
+) => {
+  const message =
+    typeof error?.message === "string" ? error.message.trim() : "";
+
+  const status = teamErrorStatus[message];
 
   if (status) {
     return res.status(status).json({
       success: false,
-      message: error.message
+      message
     });
   }
 
@@ -30,6 +38,6 @@ export const handleTeamError = (res, error, fallbackMessage) => {
 
   return res.status(500).json({
     success: false,
-    message: fallbackMessage || "Internal server error."
+    message: fallbackMessage
   });
 };

@@ -175,3 +175,28 @@ export const updatingMemberRoleFromTeam = async (teamId, memberId, role) => {
 
   return await getPopulatedTeam(teamId);
 };
+
+// deleting the team
+export const deleteTeamService = async (teamId, userId) => {
+  const team = await Team.findById(teamId);
+
+  if (!team) {
+    const error = new Error("Team not found.");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  // Only the team owner can delete the team.
+  if (String(team.createdBy) !== String(userId)) {
+    const error = new Error("You are not authorized to delete this team.");
+    error.statusCode = 403;
+    throw error;
+  }
+
+  await Team.findByIdAndDelete(teamId);
+
+  return {
+    message: "Team deleted successfully.",
+    teamId: String(teamId)
+  };
+};
