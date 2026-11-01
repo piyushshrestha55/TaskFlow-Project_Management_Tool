@@ -20,9 +20,9 @@ const Projects = () => {
     setSuccessMessage("");
   };
   return (
-    <div className="min-h-screen">
+    <div className="min-h-full">
       <UserTemplate title={"Manage Projects"} />
-      <div className="w-full min-h-screen bg-gray-100 px-10 py-6">
+      <div className="w-full min-h-full bg-gray-100 px-10 py-6">
         <CreateBtnTemplate
           description={
             "Create and manage organizational projects, track project details, and keep project information organized."

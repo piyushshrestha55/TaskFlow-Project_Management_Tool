@@ -20,7 +20,7 @@ const Dashboard = () => {
   }, []);
   console.log("Data:", data);
   return (
-    <div className="min-h-screen">
+    <div className="min-h-full">
       <UserTemplate title={"Dashboard"} />
     </div>
   );
