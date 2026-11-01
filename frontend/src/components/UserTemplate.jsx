@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
+import { LogOut, ChevronDown, ChevronUp } from "lucide-react";
 import { jwtDecode } from "jwt-decode";
 const UserTemplate = ({ title }) => {
   const [user, setUser] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login", { replace: true });
+  };
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -16,29 +25,57 @@ const UserTemplate = ({ title }) => {
     }
   }, []);
   return (
-    <div className="w-full px-3 sm:px-4 md:px-6 flex flex-wrap sm:flex-nowrap justify-between items-center gap-3 border-b-2 border-gray-300">
+    <div className="w-full min-h-16 px-3 sm:px-4 md:px-6 flex justify-between items-center gap-2 border-b-2 border-gray-300 bg-white">
       {/* Page title */}
-      <span className="font-semibold text-lg sm:text-xl min-w-0 truncate">
+
+      <h1 className="font-semibold text-base sm:text-xl min-w-0 truncate">
         {title}
-      </span>
+      </h1>
 
       {/* User profile */}
-      <div className="flex items-center gap-2 sm:gap-3 border-l-2 border-gray-300 pl-3 py-2 sm:py-3 shrink-0 max-w-[65%] sm:max-w-none">
-        <img
-          src={user?.avatar || "/avatar.jpg"}
-          alt="User avatar"
-          className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 shrink-0"
-        />
+      <div className="relative flex items-center gap-2 border-l-2 border-gray-300 pl-3 py-2">
+        {/* Profile trigger */}
+        <button
+          onClick={() => setDropdownOpen(!dropdownOpen)}
+          className="flex items-center gap-2"
+        >
+          <img
+            src={user?.avatar || "/avatar.jpg"}
+            alt="User avatar"
+            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover"
+          />
 
-        <div className="flex flex-col gap-1 min-w-0">
-          <span className="font-semibold text-sm truncate">
-            {user?.name || "User"}
-          </span>
+          <div className="hidden sm:flex flex-col items-start">
+            <span className="font-semibold text-sm">
+              {user?.name || "User"}
+            </span>
+            <span className="text-gray-500 text-xs">
+              @{user?.username || "username"}
+            </span>
+          </div>
 
-          <span className="text-gray-500 text-xs sm:text-sm truncate">
-            @{user?.username || "username"}
-          </span>
-        </div>
+          {dropdownOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </button>
+
+        {/* Dropdown */}
+        {dropdownOpen && (
+          <div className="absolute right-0 top-full mt-2 w-48 bg-white shadow-lg border rounded-md z-60 p-2">
+            <div className="px-3 py-2 border-b">
+              <p className="font-semibold text-sm">{user?.name || "User"}</p>
+              <p className="text-gray-500 text-xs">
+                @{user?.username || "username"}
+              </p>
+            </div>
+
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-2 px-3 py-2 mt-1 text-sm text-red-500 hover:bg-red-50 rounded-md"
+            >
+              <LogOut size={16} />
+              Log Out
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
