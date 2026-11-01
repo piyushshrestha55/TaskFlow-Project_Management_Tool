@@ -1,5 +1,6 @@
 export default function validateProject(name, description, teamId) {
-  if (!name || !name.trim()) {
+  // Validate project name
+  if (typeof name !== "string" || !name.trim()) {
     return "Project name is required";
   }
 
@@ -7,6 +8,7 @@ export default function validateProject(name, description, teamId) {
     return "Project name cannot exceed 100 characters";
   }
 
+  // Validate description
   if (
     description !== undefined &&
     description !== null &&
@@ -15,15 +17,16 @@ export default function validateProject(name, description, teamId) {
     return "Description must be a string";
   }
 
-  if (description && description.trim().length > 1000) {
+  if (typeof description === "string" && description.trim().length > 1000) {
     return "Description cannot exceed 1000 characters";
   }
 
-  if (
-    teamId !== undefined &&
-    teamId !== null &&
-    !/^[0-9a-fA-F]{24}$/.test(teamId)
-  ) {
+  // Validate team ID
+  if (!teamId) {
+    return "Team ID is required";
+  }
+
+  if (typeof teamId !== "string" || !/^[0-9a-fA-F]{24}$/.test(teamId)) {
     return "Invalid team ID";
   }
 

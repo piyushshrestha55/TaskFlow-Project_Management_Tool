@@ -1,6 +1,11 @@
 import Team from "../model/Team.js";
 import Project from "../model/Project.js";
 import { User } from "../model/User.js";
+import { deleteTeamProject } from "./project.service.js";
+import {
+  addTeamMemberToProject,
+  removeTeamMemberFromProject
+} from "./projectMembership.service.js";
 // Reusable filter for teams accessible to a user
 const getUserTeamFilter = (userId) => ({
   $or: [{ createdBy: userId }, { "members.userId": userId }]
@@ -26,19 +31,22 @@ export const getUserTeamCount = async (userId) => {
 // gets all the team members of the user
 export const getUserTeamMemberCount = async (userId) => {
   const result = await Team.aggregate([
-    { $match: getUserTeamFilter(userId) },
     {
-      $project: {
-        memberCount: { $size: "$members" }
-      }
+      $match: getUserTeamFilter(userId)
+    },
+    {
+      $unwind: "$members"
     },
     {
       $group: {
-        _id: null,
-        total: { $sum: "$memberCount" }
+        _id: "$members.userId"
       }
+    },
+    {
+      $count: "total"
     }
   ]);
+
   return result[0]?.total ?? 0;
 };
 
@@ -98,6 +106,7 @@ export const addMembersToTeam = async (teamId, memberId) => {
   });
 
   await team.save();
+  await addTeamMemberToProject(team._id, memberId);
 
   // Return populated member details.
   return await getPopulatedTeam(team._id);
@@ -128,7 +137,7 @@ export const removeMemberFromTeam = async (teamId, memberId) => {
   );
 
   await team.save();
-
+  await removeTeamMemberFromProject(team._id, memberId);
   return await getPopulatedTeam(team._id);
 };
 
@@ -192,7 +201,12 @@ export const deleteTeamService = async (teamId, userId) => {
     error.statusCode = 403;
     throw error;
   }
+  // Delete associated project if it exists
+  const project = await Project.findOne({ teamId: team._id });
 
+  if (project) {
+    await deleteTeamProject(project._id, userId);
+  }
   await Team.findByIdAndDelete(teamId);
 
   return {
