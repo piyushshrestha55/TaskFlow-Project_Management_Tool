@@ -39,7 +39,9 @@ export const createTeamProject = async (
   description,
   status,
   team,
-  userId
+  userId,
+  startDate,
+  dueDate
 ) => {
   if (!team) {
     throw new Error("Team not found.");
@@ -72,7 +74,9 @@ export const createTeamProject = async (
     status,
     ownerId: team.createdBy,
     teamId: team._id,
-    members: projectMembers
+    members: projectMembers,
+    startDate: startDate,
+    dueDate: dueDate
   });
 
   return project;

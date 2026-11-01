@@ -46,11 +46,15 @@ const createSchema = z
     }
   );
 
-const CreateProject = ({ onProjectCreated, onCancel }) => {
+const CreateProject = ({
+  onProjectCreated,
+  onCancel,
+  successMessage,
+  setSuccessMessage
+}) => {
   const [teams, setTeams] = useState([]);
   const [teamsLoading, setTeamsLoading] = useState(true);
   const [teamsError, setTeamsError] = useState("");
-
   const createForm = useForm({
     resolver: zodResolver(createSchema),
     defaultValues: {
@@ -89,28 +93,33 @@ const CreateProject = ({ onProjectCreated, onCancel }) => {
   const onSubmit = async (data) => {
     try {
       createForm.clearErrors("root");
+      setSuccessMessage("");
 
       const payload = {
         ...data,
-        teamId: data.teamId,
         startDate: data.startDate || null,
         dueDate: data.dueDate || null
       };
 
-      // TODO: Replace with your actual project creation endpoint.
       const response = await api.post("/project/create", payload);
 
-      onProjectCreated?.(response.data.project);
-      createForm.reset();
-    } catch (error) {
-      if (error.response?.status !== 401) {
-        createForm.setError("root.serverError", {
-          type: "server",
-          message:
-            error.response?.data?.message ||
-            "Failed to create project. Please try again."
-        });
+      if (response.data.success) {
+        createForm.reset();
+
+        onProjectCreated?.(response.data.project);
+      } else {
+        throw new Error(response.data.message || "Failed to create project.");
       }
+    } catch (error) {
+      console.error("Project creation error:", error);
+
+      createForm.setError("root.serverError", {
+        type: "server",
+        message:
+          error.response?.data?.message ||
+          error.message ||
+          "Failed to create project. Please try again."
+      });
     }
   };
 
@@ -122,6 +131,15 @@ const CreateProject = ({ onProjectCreated, onCancel }) => {
       <h2 className="mb-5 text-lg font-semibold">Create New Project</h2>
 
       <form onSubmit={createForm.handleSubmit(onSubmit)} className="space-y-4">
+        {successMessage && (
+          <div
+            role="status"
+            className="rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700"
+          >
+            ✓ {successMessage}
+          </div>
+        )}
+
         {createForm.formState.errors.root?.serverError && (
           <div
             role="alert"

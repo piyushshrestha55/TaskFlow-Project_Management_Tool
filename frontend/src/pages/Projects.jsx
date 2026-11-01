@@ -7,7 +7,18 @@ import CreateProject from "@/components/Projects/CreateProject";
 const Projects = () => {
   const data = useLoaderData();
   const [showForm, setShowForm] = useState(false);
+  const [projects, setProjects] = useState(data.projects ?? []);
   console.log("Data:", data);
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const onProjectCreated = (newProject) => {
+    setProjects((prev) => [...prev, newProject]);
+
+    setSuccessMessage("Project created successfully!");
+
+    setShowForm(false);
+    setSuccessMessage("");
+  };
   return (
     <div className="min-h-screen">
       <UserTemplate title={"Manage Projects"} />
@@ -21,12 +32,13 @@ const Projects = () => {
         />
         {showForm && (
           <CreateProject
-            onProjectCreated={(newProject) => {
-              // Add the new project to your projects state.
-              setProjects((prev) => [...prev, newProject]);
+            onProjectCreated={onProjectCreated}
+            onCancel={() => {
               setShowForm(false);
+              setSuccessMessage("");
             }}
-            onCancel={() => setShowForm(false)}
+            successMessage={successMessage}
+            setSuccessMessage={setSuccessMessage}
           />
         )}
       </div>

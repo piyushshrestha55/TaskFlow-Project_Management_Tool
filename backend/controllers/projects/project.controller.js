@@ -1,11 +1,11 @@
-import Project from "../../model/Project.js";
+import Team from "../../model/Team.js";
 import {
   getUserProjects,
   createTeamProject,
   deleteTeamProject
 } from "../../service/project.service.js";
 import { handleProjectError } from "../../utils/projectErrorHandler.js";
-import { validateProject } from "../../utils/validateProject.js";
+import validateProject from "../../validator/project.validator.js";
 const loadProject = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -21,7 +21,7 @@ const loadProject = async (req, res) => {
 };
 const createProject = async (req, res) => {
   try {
-    const { name, description, teamId, status } = req.body;
+    const { name, description, teamId, status, startDate, dueDate } = req.body;
 
     // Validate project data
     const error = validateProject(name, description, teamId);
@@ -49,7 +49,9 @@ const createProject = async (req, res) => {
       description,
       status,
       team,
-      req.user.id
+      req.user.id,
+      startDate,
+      dueDate
     );
 
     return res.status(201).json({
