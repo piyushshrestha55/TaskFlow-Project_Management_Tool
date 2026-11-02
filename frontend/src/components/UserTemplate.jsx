@@ -25,7 +25,7 @@ const UserTemplate = ({ title }) => {
     }
   }, []);
   return (
-    <div className="w-full min-h-16 px-3 sm:px-4 md:px-6 flex justify-between items-center gap-2 border-b-2 border-gray-300 bg-white">
+    <div className="w-full min-h-16 px-3 sm:px-4 md:px-6 py-1.5 flex justify-between items-center gap-2 border-b-2 border-gray-300 bg-white">
       {/* Page title */}
 
       <h1 className="font-semibold text-base sm:text-xl min-w-0 truncate">

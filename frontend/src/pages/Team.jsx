@@ -13,10 +13,10 @@ const Team = () => {
   const [showForm, setShowForm] = useState(false);
   console.log(teams);
   return (
-    <div className="min-h-full">
+    <div className="min-h-screen">
       <UserTemplate title="Team Management" />
 
-      <div className="w-full min-h-full bg-gray-100 px-10 py-6">
+      <div className="w-full min-h-screen bg-gray-100 px-10 py-6">
         <CreateBtnImage
           description={
             "Create and manage organizational teams, organize members, and keep team information up to date."

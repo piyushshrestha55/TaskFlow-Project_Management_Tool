@@ -5,7 +5,7 @@ const Task = () => {
   const data = useLoaderData();
   console.log("Data:", data);
   return (
-    <div className="min-h-full">
+    <div className="min-h-screen">
       <UserTemplate title={"Task Management"} />
     </div>
   );
