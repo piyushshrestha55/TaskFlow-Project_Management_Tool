@@ -12,7 +12,9 @@ export const isAdmin = async (req, res, next) => {
         message: "Team not found."
       });
     }
-
+    if (team.createdBy.toString() === userId.toString()) {
+      return next();
+    }
     const member = team.members.find(
       (member) => member.userId.toString() === userId.toString()
     );
@@ -24,6 +26,7 @@ export const isAdmin = async (req, res, next) => {
     }
     next();
   } catch (error) {
+    console.error("Admin authorization error:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error."
