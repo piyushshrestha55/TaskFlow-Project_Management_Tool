@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useLoaderData } from "react-router";
 import CreateBtnTemplate from "@/components/createBtnTemplate";
 import CreateProject from "@/components/Projects/CreateProject";
+import ProjectCard from "@/components/Projects/projectCard";
 
 const Projects = () => {
   const data = useLoaderData();
@@ -41,6 +42,8 @@ const Projects = () => {
             setSuccessMessage={setSuccessMessage}
           />
         )}
+        {/* {ProjectCards */}
+        <ProjectCard projects={projects} />
       </div>
     </div>
   );

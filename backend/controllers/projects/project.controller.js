@@ -6,7 +6,7 @@ import {
   updateProjectDueDate,
   updateProjectMemberRole,
   updateProjectStartDate,
-  updateProjectStartDate
+  updateProjectStatus
 } from "../../service/project.service.js";
 import { handleProjectError } from "../../utils/projectErrorHandler.js";
 import validateProject from "../../validator/project.validator.js";
