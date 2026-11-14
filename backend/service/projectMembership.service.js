@@ -31,6 +31,6 @@ export const removeTeamMemberFromProject = async (teamId, userId) => {
         members: { userId }
       }
     },
-    { new: true }
+    { new: true } // returns the updated document
   );
 };

@@ -16,9 +16,7 @@ const Projects = () => {
     setProjects((prev) => [...prev, newProject]);
 
     setSuccessMessage("Project created successfully!");
-
     setShowForm(false);
-    setSuccessMessage("");
   };
   return (
     <div className="min-h-screen">
@@ -43,7 +41,7 @@ const Projects = () => {
           />
         )}
         {/* {ProjectCards */}
-        <ProjectCard projects={projects} />
+        <ProjectCard projects={projects} setProjects={setProjects} />
       </div>
     </div>
   );

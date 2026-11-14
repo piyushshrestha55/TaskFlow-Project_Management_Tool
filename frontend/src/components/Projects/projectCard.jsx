@@ -1,14 +1,36 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "motion/react";
 import {
   ChevronRight,
   FolderKanban,
   CalendarDays,
   UserRound,
-  Clock
+  Clock,
+  ArrowRight
 } from "lucide-react";
+import ProjectDetails from "./ProjectDetails";
+const ProjectCard = ({ projects, setProjects }) => {
+  const [project, setProject] = useState(null);
+  const handleProjectUpdated = (updatedProject) => {
+    // Handle project deletion
+    if (updatedProject?._deleted) {
+      setProjects((prevProjects) =>
+        prevProjects.filter((p) => String(p._id) !== String(updatedProject._id))
+      );
 
-const ProjectCard = ({ projects }) => {
+      setProject(null);
+      return;
+    }
+
+    // Handle project update
+    setProjects((prevProjects) =>
+      prevProjects.map((p) =>
+        String(p._id) === String(updatedProject._id) ? updatedProject : p
+      )
+    );
+
+    setProject(updatedProject);
+  };
   if (!projects?.length) {
     return (
       <div
@@ -54,6 +76,7 @@ const ProjectCard = ({ projects }) => {
         {projects.map((project, index) => (
           <motion.div
             key={project._id}
+            onClick={() => setProject(project)}
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
@@ -182,34 +205,6 @@ const ProjectCard = ({ projects }) => {
                   </div>
                 </div>
               </div>
-
-              {/* Progress */}
-              {project.progress !== undefined && (
-                <div className="mt-5">
-                  <div className="mb-2 flex items-center justify-between">
-                    <span className="text-xs font-medium text-gray-500">
-                      Project progress
-                    </span>
-
-                    <span className="text-xs font-semibold text-orange-500">
-                      {project.progress}%
-                    </span>
-                  </div>
-
-                  <div className="h-2 overflow-hidden rounded-full bg-gray-100">
-                    <div
-                      className="h-full rounded-full bg-orange-500
-                      transition-all duration-300"
-                      style={{
-                        width: `${Math.min(
-                          100,
-                          Math.max(0, Number(project.progress) || 0)
-                        )}%`
-                      }}
-                    />
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* Footer */}
@@ -219,13 +214,18 @@ const ProjectCard = ({ projects }) => {
             >
               <span className="text-xs text-gray-400">Project workspace</span>
 
-              <span className="text-sm font-semibold text-orange-500">
-                Project
+              <span className="text-sm font-semibold text-orange-500 flex gap-2 items-center">
+                View Project Details <ArrowRight size={17} />
               </span>
             </div>
           </motion.div>
         ))}
       </div>
+      <ProjectDetails
+        project={project}
+        onClose={() => setProject(null)}
+        onProjectUpdated={handleProjectUpdated}
+      />
     </div>
   );
 };
