@@ -78,7 +78,7 @@ const addMember = async (req, res) => {
 const removeMember = async (req, res) => {
   try {
     const { teamId, memberId } = req.params;
-
+    const currentUser = req.user.id;
     if (!memberId) {
       return res.status(400).json({
         success: false,
@@ -96,7 +96,7 @@ const removeMember = async (req, res) => {
       });
     }
 
-    const team = await removeMemberFromTeam(teamId, memberId);
+    const team = await removeMemberFromTeam(teamId, memberId, currentUser);
 
     return res.status(200).json({
       success: true,
@@ -112,7 +112,7 @@ const updateMemberRole = async (req, res) => {
   try {
     const { teamId, memberId } = req.params;
     const { role } = req.body;
-
+    const currentUser = req.user.id;
     // Validate role
     if (!role) {
       return res.status(400).json({
@@ -133,7 +133,12 @@ const updateMemberRole = async (req, res) => {
     }
 
     // Calling the service
-    const team = await updatingMemberRoleFromTeam(teamId, memberId, role);
+    const team = await updatingMemberRoleFromTeam(
+      teamId,
+      memberId,
+      role,
+      currentUser
+    );
 
     return res.status(200).json({
       success: true,

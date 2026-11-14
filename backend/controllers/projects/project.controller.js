@@ -93,7 +93,7 @@ const updateMemberRole = async (req, res) => {
   try {
     const { projectId, memberId } = req.params;
     const { role } = req.body;
-
+    const currentUser = req.user.id;
     if (
       !projectId ||
       !/^[0-9a-fA-F]{24}$/.test(projectId) ||
@@ -113,7 +113,12 @@ const updateMemberRole = async (req, res) => {
       });
     }
 
-    const project = await updateProjectMemberRole(memberId, projectId, role);
+    const project = await updateProjectMemberRole(
+      memberId,
+      projectId,
+      role,
+      currentUser
+    );
 
     return res.status(200).json({
       success: true,

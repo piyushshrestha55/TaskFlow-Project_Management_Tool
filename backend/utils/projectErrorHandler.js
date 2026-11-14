@@ -12,6 +12,7 @@ export const projectErrorStatus = {
   "You are not authorized to delete this project.": 403,
   "Cannot remove the project owner.": 403,
   "Cannot change the project owner's role.": 403,
+  "Cannot change your own role.": 403,
 
   // 400 - Bad Request
   "Invalid role.": 400,

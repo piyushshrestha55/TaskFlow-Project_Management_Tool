@@ -83,7 +83,6 @@ export const addMembersToTeam = async (teamId, memberId) => {
   if (!team) {
     throw new Error("Team not found.");
   }
-
   // Verify that the registered user exists.
   const userExists = await User.exists({ _id: memberId });
 
@@ -113,13 +112,16 @@ export const addMembersToTeam = async (teamId, memberId) => {
 };
 
 // delete the team members
-export const removeMemberFromTeam = async (teamId, memberId) => {
+export const removeMemberFromTeam = async (teamId, memberId, currentUser) => {
   const team = await Team.findById(teamId);
 
   if (!team) {
     throw new Error("Team not found.");
   }
 
+  if (String(currentUser) === String(memberId)) {
+    throw new Error("Cannot change your own role.");
+  }
   if (String(team.createdBy) === String(memberId)) {
     throw new Error("Cannot remove the team creator.");
   }
@@ -142,7 +144,12 @@ export const removeMemberFromTeam = async (teamId, memberId) => {
 };
 
 // updates the members role in the team
-export const updatingMemberRoleFromTeam = async (teamId, memberId, role) => {
+export const updatingMemberRoleFromTeam = async (
+  teamId,
+  memberId,
+  role,
+  currentUser
+) => {
   const allowedRoles = ["admin", "member"];
 
   if (!allowedRoles.includes(role)) {
@@ -153,6 +160,9 @@ export const updatingMemberRoleFromTeam = async (teamId, memberId, role) => {
 
   if (!team) {
     throw new Error("Team not found.");
+  }
+  if (String(currentUser) === String(memberId)) {
+    throw new Error("Cannot change your own role.");
   }
 
   // Prevent changing the creators role.

@@ -1,3 +1,4 @@
+import Project from "../model/Project.js";
 // Adding a member to the project
 export const addTeamMemberToProject = async (teamId, userId) => {
   const project = await Project.findOne({ teamId });
@@ -8,7 +9,7 @@ export const addTeamMemberToProject = async (teamId, userId) => {
   await Project.updateOne(
     {
       _id: project._id,
-      "member.userId": { $ne: userId }
+      "members.userId": { $ne: userId }
     },
     {
       $push: {
@@ -31,6 +32,6 @@ export const removeTeamMemberFromProject = async (teamId, userId) => {
         members: { userId }
       }
     },
-    { new: true } // returns the updated document
+    { returnDocument: "after" } // returns the updated document
   );
 };

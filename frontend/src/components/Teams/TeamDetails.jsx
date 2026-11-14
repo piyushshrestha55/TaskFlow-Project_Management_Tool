@@ -8,6 +8,7 @@ import ManageTeam from "./ManageTeam";
 const TeamDetails = ({ team, onClose, onTeamUpdated }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isManageOpen, setIsManageOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState("");
   useEffect(() => {
     try {
       const token = localStorage.getItem("token");
@@ -21,6 +22,7 @@ const TeamDetails = ({ team, onClose, onTeamUpdated }) => {
         const memberId = member.userId?._id ?? member.userId;
         return String(memberId) === String(loggedUserId);
       });
+      setCurrentUser(loggedUserId);
       setIsAdmin(currentMember?.role?.toLowerCase() === "admin");
     } catch (error) {
       console.error("Failed to validate team role:", error);
@@ -134,6 +136,7 @@ const TeamDetails = ({ team, onClose, onTeamUpdated }) => {
           team={team}
           onClose={() => setIsManageOpen(false)}
           onTeamUpdated={onTeamUpdated}
+          currentUser={currentUser}
         />
       )}
     </motion.section>

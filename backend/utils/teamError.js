@@ -7,6 +7,7 @@ export const teamErrorStatus = {
   // 403 - Forbidden
   "Cannot remove the team creator.": 403,
   "Cannot change the team creator's role.": 403,
+  "Cannot change your own role.": 403,
 
   // 400 - Bad Request
   "Invalid role.": 400,

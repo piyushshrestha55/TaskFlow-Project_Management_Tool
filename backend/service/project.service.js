@@ -109,7 +109,12 @@ const getPopulatedProject = async (projectId) => {
 };
 
 // updating the role of the member in a project
-export const updateProjectMemberRole = async (memberId, projectId, role) => {
+export const updateProjectMemberRole = async (
+  memberId,
+  projectId,
+  role,
+  currentUser
+) => {
   const allowedRoles = ["manager", "member", "viewer"];
   if (!allowedRoles.includes(role)) {
     throw new Error("Invalid role.");
@@ -120,6 +125,9 @@ export const updateProjectMemberRole = async (memberId, projectId, role) => {
     throw new Error("Team not found.");
   }
 
+  if (String(currentUser) === String(memberId)) {
+    throw new Error("Cannot change your own role.");
+  }
   //to prevent the owners role to change
   if (String(project.ownerId) === String(memberId)) {
     throw new Error("Cannot change the project owners role.");
@@ -132,9 +140,9 @@ export const updateProjectMemberRole = async (memberId, projectId, role) => {
   if (!memberExists) {
     throw new Error("Member is not found in the project.");
   }
-  await Team.updateOne(
+  await Project.updateOne(
     {
-      _id: teamId,
+      _id: projectId,
       "members.userId": memberId
     },
     {

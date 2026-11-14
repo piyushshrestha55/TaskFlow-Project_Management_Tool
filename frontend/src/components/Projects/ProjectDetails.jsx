@@ -11,10 +11,12 @@ import {
 } from "lucide-react";
 import { jwtDecode } from "jwt-decode";
 import { Button } from "../ui/button";
+import ManageProject from "./ManageProject";
 
 const ProjectDetails = ({ project, onClose, onProjectUpdated }) => {
   const [isManager, setIsManager] = useState(false);
-
+  const [isManageOpen, setIsManageOpen] = useState(false);
+  const [currentMember, setCurrentMember] = useState("");
   useEffect(() => {
     try {
       const token = localStorage.getItem("token");
@@ -32,6 +34,7 @@ const ProjectDetails = ({ project, onClose, onProjectUpdated }) => {
 
         return String(memberId) === String(loggedUserId);
       });
+      setCurrentMember(loggedUserId);
 
       setIsManager(
         typeof currentMember?.role === "string" &&
@@ -174,10 +177,10 @@ const ProjectDetails = ({ project, onClose, onProjectUpdated }) => {
             </div>
 
             <div>
-              <p className="text-sm font-medium text-gray-700">Deadline</p>
+              <p className="text-sm font-medium text-gray-700">Due Date</p>
 
               <p className="text-xs text-gray-400">
-                {formatDate(project.deadline)}
+                {formatDate(project.dueDate)}
               </p>
             </div>
           </div>
@@ -202,11 +205,30 @@ const ProjectDetails = ({ project, onClose, onProjectUpdated }) => {
 
             const isMemberManager =
               typeof role === "string" && role.toLowerCase() === "manager";
-
+            const isMemberViewer =
+              typeof role === "string" && role.toLowerCase === "viewer";
             const user = member.userId?._id ? member.userId : member.userId;
 
             const userId = user?._id ?? user;
+            const roleConfig = {
+              manager: {
+                label: "Manager",
+                className: "bg-orange-50 text-orange-600",
+                icon: <ShieldCheck size={12} />
+              },
+              viewer: {
+                label: "Viewer",
+                className: "bg-purple-50 text-purple-600",
+                icon: null
+              },
+              member: {
+                label: "Member",
+                className: "bg-blue-50 text-blue-600",
+                icon: null
+              }
+            };
 
+            const config = roleConfig[role] ?? roleConfig.member;
             return (
               <div
                 key={String(userId ?? index)}
@@ -231,15 +253,10 @@ const ProjectDetails = ({ project, onClose, onProjectUpdated }) => {
                 </div>
 
                 <span
-                  className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ${
-                    isMemberManager
-                      ? "bg-orange-50 text-orange-600"
-                      : "bg-blue-50 text-blue-600"
-                  }`}
+                  className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ${config.className}`}
                 >
-                  {isMemberManager && <ShieldCheck size={12} />}
-
-                  {isMemberManager ? "Manager" : "Member"}
+                  {config.icon}
+                  {config.label}
                 </span>
               </div>
             );
@@ -255,12 +272,23 @@ const ProjectDetails = ({ project, onClose, onProjectUpdated }) => {
         {/* Manager Actions */}
         {isManager && (
           <div className="mt-5 flex justify-end">
-            <Button className="bg-orange-500 text-white hover:bg-orange-600 hover:-translate-y-0.5">
+            <Button
+              className="bg-orange-500 text-white hover:bg-orange-600 hover:-translate-y-0.5"
+              onClick={() => setIsManageOpen((prev) => !prev)}
+            >
               Manage Project
             </Button>
           </div>
         )}
       </div>
+      {isManager && isManageOpen && (
+        <ManageProject
+          project={project}
+          onClose={() => setIsManageOpen(false)}
+          onProjectUpdated={onProjectUpdated}
+          currentUser={currentMember}
+        />
+      )}
     </motion.section>
   );
 };

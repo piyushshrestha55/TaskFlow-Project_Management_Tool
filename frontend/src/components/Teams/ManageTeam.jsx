@@ -13,7 +13,7 @@ import {
 import { Button } from "../ui/button";
 import api from "@/api/axios";
 
-const ManageTeam = ({ team, onClose, onTeamUpdated }) => {
+const ManageTeam = ({ team, onClose, onTeamUpdated, currentUser }) => {
   const [members, setMembers] = useState(team?.members ?? []);
   const [email, setEmail] = useState("");
   const [foundUser, setFoundUser] = useState(null);
@@ -166,7 +166,12 @@ const ManageTeam = ({ team, onClose, onTeamUpdated }) => {
       updateMembers(nextMembers);
       setSuccess("Member role updated successfully.");
     } catch (err) {
-      setError(err.message || "Unable to update member role.");
+      setError(
+        err.response?.data?.message ||
+          (err.response?.status === 403
+            ? "You don't have permission to change role of this member."
+            : "Unable to remove this member.")
+      );
     } finally {
       setUpdatingId(null);
     }
@@ -200,7 +205,12 @@ const ManageTeam = ({ team, onClose, onTeamUpdated }) => {
       updateMembers(nextMembers);
       setSuccess(`${memberName} was removed from the team.`);
     } catch (err) {
-      setError(err.message || "Unable to remove this member.");
+      setError(
+        err.response?.data?.message ||
+          (err.response?.status === 403
+            ? "You don't have permission to remove this member."
+            : "Unable to remove this member.")
+      );
     } finally {
       setRemovingId(null);
     }
@@ -417,6 +427,7 @@ const ManageTeam = ({ team, onClose, onTeamUpdated }) => {
               const user = member.userId;
               const userId = user?._id ?? user;
               const role = member.role?.toLowerCase() ?? "member";
+              const isCurrentUser = String(userId) === String(currentUser);
               const isUpdating = updatingId === String(userId);
               const isRemoving = removingId === String(userId);
 
@@ -464,14 +475,14 @@ const ManageTeam = ({ team, onClose, onTeamUpdated }) => {
                     <select
                       id={`role-${userId}`}
                       value={role}
-                      disabled={isUpdating || isRemoving}
+                      disabled={isCurrentUser || isUpdating || isRemoving}
                       onChange={(event) =>
                         handleRoleChange(member, event.target.value)
                       }
                       className="min-w-28 rounded-lg border
                         border-gray-200 bg-white px-3 py-2
                         text-sm text-gray-700 outline-none
-                        focus:border-orange-400 disabled:opacity-50"
+                        focus:border-orange-400 disabled:opacity-50 disabled:opacity-40"
                     >
                       <option value="member">Member</option>
                       <option value="admin">Admin</option>
@@ -489,7 +500,7 @@ const ManageTeam = ({ team, onClose, onTeamUpdated }) => {
                     <button
                       type="button"
                       onClick={() => handleRemoveMember(member)}
-                      disabled={isUpdating || isRemoving}
+                      disabled={isCurrentUser || isUpdating || isRemoving}
                       aria-label={`Remove ${user?.name ?? "member"}`}
                       title="Remove member"
                       className="rounded-lg p-2 text-red-500

@@ -11,7 +11,6 @@ const Team = () => {
   const { teams: initialTeams } = useLoaderData();
   const [teams, setTeams] = useState(initialTeams ?? []);
   const [showForm, setShowForm] = useState(false);
-  console.log(teams);
   return (
     <div className="min-h-screen">
       <UserTemplate title="Team Management" />
