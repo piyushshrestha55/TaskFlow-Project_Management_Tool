@@ -234,3 +234,21 @@ export const updateProjectDueDate = async (projectId, dueDate) => {
   );
   return await getPopulatedProject(projectId);
 };
+
+// get the project members  for the task assignment
+export const getProjectMembers = async (userId, projectId) => {
+  const filter = await getUserProjectFilter(userId);
+  const project = await Project.findOne({
+    _id: projectId,
+    ...filter
+  }).populate("members.userId", "name");
+
+  if (!project) {
+    throw new Error("Project not found or access denied.");
+  }
+
+  return project.members.map((member) => ({
+    _id: member.userId._id,
+    username: member.userId.name
+  }));
+};
