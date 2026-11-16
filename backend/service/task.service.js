@@ -83,3 +83,81 @@ export const createProjectTask = async (userId, projectId, taskData) => {
 
   return await Task.findById(task._id).populate("assigneeId", "name email");
 };
+
+//update the task description
+export const updateProjectTask = async (taskId, taskData, userId) => {
+  const task = await Task.findById(taskId);
+
+  const TASK_STATUSES = ["todo", "in_progress", "review", "done"];
+
+  const TASK_PRIORITIES = ["low", "medium", "high", "urgent"];
+  if (!task) {
+    throw new Error("Task not found.");
+  }
+
+  //checking whether the user has the access to the Task Project
+  await checkProjectAccess(userId, task.projectId);
+
+  if (
+    taskData.status !== undefined &&
+    !TASK_STATUSES.includes(taskData.status)
+  ) {
+    throw new Error("Invalid task status.");
+  }
+
+  if (
+    taskData.priority !== undefined &&
+    !TASK_PRIORITIES.includes(taskData.priority)
+  ) {
+    throw new Error("Invalid task priority.");
+  }
+
+  //validating the dueDate
+  if (taskData.dueDate !== undefined && taskData.dueDate !== null) {
+    const date = new Date(taskData.dueDate);
+    if (isNaN(data.getTime())) {
+      throw new Error("Invalid due date.");
+    }
+
+    taskData.dueDate = date;
+  }
+
+  const allowedFields = [
+    "title",
+    "description",
+    "status",
+    "priority",
+    "assigneeId",
+    "dueDate"
+  ];
+
+  allowedFields.forEach((field) => {
+    if (taskData[field] !== undefined) {
+      task[field] = taskData[field];
+    }
+  });
+
+  await task.save();
+
+  return await Task.findById(taskId)
+    .populate("assigneeId", "name email")
+    .populate("projectId", "name");
+};
+
+// Delete a task from a project
+export const deleteProjectTask = async (taskId, userId) => {
+  const task = await Task.findById(taskId);
+
+  if (!task) {
+    throw new Error("Task not found.");
+  }
+
+  // Check whether the user has access to the task's project
+  await checkProjectAccess(userId, task.projectId);
+
+  await Task.findByIdAndDelete(taskId);
+
+  return {
+    message: "Task deleted successfully."
+  };
+};
