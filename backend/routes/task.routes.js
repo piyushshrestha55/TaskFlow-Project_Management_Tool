@@ -5,7 +5,8 @@ import {
   createTask,
   loadMyTasks,
   loadTasksByProject,
-  updateTask
+  updateTask,
+  deleteTask
 } from "../controllers/tasks/tasks.controller.js";
 import { isManager } from "../middleware/manager.middleware.js";
 const router = express.Router();

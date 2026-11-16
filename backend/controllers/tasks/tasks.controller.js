@@ -126,4 +126,11 @@ export const deleteTask = async (req, res) => {
     });
   }
 };
-export { loadTasks, loadMyTasks, createTask, updateTask, loadTasksByProject };
+export {
+  loadTasks,
+  loadMyTasks,
+  createTask,
+  updateTask,
+  loadTasksByProject,
+  deleteTask
+};
